@@ -1,0 +1,8 @@
+@echo off
+echo Installing required Python package...
+python -m pip install pyautogui
+echo.
+echo Starting mouse jiggler - press Ctrl+C to stop
+echo Mouse will jiggle every 15 seconds
+python mouse_jiggler.py
+pause
