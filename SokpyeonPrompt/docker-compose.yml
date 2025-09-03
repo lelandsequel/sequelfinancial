@@ -1,0 +1,22 @@
+version: '3'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - 5000:5000
+    environment:
+      - FIREBASE_PROJECT_ID=your_firebase_project_id
+      - FIREBASE_SERVICE_ACCOUNT_PATH=/app/serviceAccountKey.json
+      - JWT_SECRET=your_jwt_secret_here
+      - STRIPE_SECRET_KEY=your_stripe_secret_key
+      - STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+      - FRONTEND_URL=http://localhost:80
+    volumes:
+      - ./backend:/app
+      - /path/to/your/serviceAccountKey.json:/app/serviceAccountKey.json
+  frontend:
+    build: ./frontend
+    ports:
+      - 80:80
+    depends_on:
+      - backend 
