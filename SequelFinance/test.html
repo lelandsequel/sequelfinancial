@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance U - Test Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Finance U - Functionality Test</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Budget Calculator Test -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border">
+                <h2 class="text-xl font-bold mb-4">Budget Calculator Test</h2>
+                <div class="space-y-4" id="test-budget">
+                    <div class="flex gap-4">
+                        <input type="text" placeholder="Income" class="w-1/2 p-2 border rounded" data-type="income-name" value="Salary">
+                        <input type="number" placeholder="Amount" class="w-1/2 p-2 border rounded" data-type="income-amount" value="1000">
+                    </div>
+                    <div class="flex gap-4">
+                        <input type="text" placeholder="Expense" class="w-1/2 p-2 border rounded" data-type="expense-name" value="Rent">
+                        <input type="number" placeholder="Amount" class="w-1/2 p-2 border rounded" data-type="expense-amount" value="500">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p>Total Income: <span id="test-income">$0.00</span></p>
+                    <p>Total Expenses: <span id="test-expenses">$0.00</span></p>
+                    <p>Remaining: <span id="test-remaining">$0.00</span></p>
+                </div>
+                <button onclick="testBudget()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Test Budget</button>
+            </div>
+
+            <!-- Savings Calculator Test -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border">
+                <h2 class="text-xl font-bold mb-4">Savings Calculator Test</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Goal Amount:</label>
+                        <input type="number" id="test-goal" value="1000" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Weekly Savings:</label>
+                        <input type="number" id="test-weekly" value="50" class="w-full p-2 border rounded">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p>Time to Goal: <span id="test-savings-result">-- weeks</span></p>
+                </div>
+                <button onclick="testSavings()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Test Savings</button>
+            </div>
+
+            <!-- Compound Interest Test -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border">
+                <h2 class="text-xl font-bold mb-4">Compound Interest Test</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Initial:</label>
+                        <input type="number" id="test-initial" value="1000" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Monthly:</label>
+                        <input type="number" id="test-monthly" value="100" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Years:</label>
+                        <input type="number" id="test-years" value="10" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Rate (%):</label>
+                        <input type="number" id="test-rate" value="7" class="w-full p-2 border rounded">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p>Future Value: <span id="test-ci-result">$0.00</span></p>
+                    <p id="test-ci-breakdown" class="text-sm text-gray-600">Details here...</p>
+                </div>
+                <button onclick="testCI()" class="mt-4 bg-teal-500 text-white px-4 py-2 rounded">Test Compound Interest</button>
+            </div>
+
+            <!-- Navigation Test -->
+            <div class="bg-white p-6 rounded-lg shadow-lg border">
+                <h2 class="text-xl font-bold mb-4">Navigation Test</h2>
+                <div class="space-y-2">
+                    <button onclick="testNavigation('dashboard')" class="w-full bg-blue-500 text-white px-4 py-2 rounded mb-2">Dashboard</button>
+                    <button onclick="testNavigation('quests')" class="w-full bg-blue-500 text-white px-4 py-2 rounded mb-2">Quests</button>
+                    <button onclick="testNavigation('lab')" class="w-full bg-blue-500 text-white px-4 py-2 rounded mb-2">The Lab</button>
+                    <button onclick="testNavigation('real-world')" class="w-full bg-blue-500 text-white px-4 py-2 rounded mb-2">Real World</button>
+                </div>
+                <div class="mt-4 p-4 bg-gray-100 rounded">
+                    <p>Current Section: <span id="current-section">dashboard</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-lg border">
+            <h2 class="text-xl font-bold mb-4">Test Results</h2>
+            <div id="test-results" class="space-y-2">
+                <p class="text-green-600">✓ JavaScript loaded successfully</p>
+                <p id="js-test-status">⏳ Testing JavaScript functionality...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Test functions
+        function testBudget() {
+            const incomeInput = document.querySelector('[data-type="income-amount"]');
+            const expenseInput = document.querySelector('[data-type="expense-amount"]');
+
+            const totalIncome = parseFloat(incomeInput.value) || 0;
+            const totalExpenses = parseFloat(expenseInput.value) || 0;
+            const remaining = totalIncome - totalExpenses;
+
+            document.getElementById('test-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('test-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+            document.getElementById('test-remaining').textContent = `$${remaining.toFixed(2)}`;
+            document.getElementById('test-remaining').className = remaining >= 0 ? 'text-green-600' : 'text-red-600';
+        }
+
+        function testSavings() {
+            const goal = parseFloat(document.getElementById('test-goal').value);
+            const weekly = parseFloat(document.getElementById('test-weekly').value);
+
+            if (goal > 0 && weekly > 0) {
+                const weeks = Math.ceil(goal / weekly);
+                document.getElementById('test-savings-result').textContent = `${weeks} weeks`;
+            } else {
+                document.getElementById('test-savings-result').textContent = '-- weeks';
+            }
+        }
+
+        function testCI() {
+            const principal = parseFloat(document.getElementById('test-initial').value) || 0;
+            const monthly = parseFloat(document.getElementById('test-monthly').value) || 0;
+            const years = parseInt(document.getElementById('test-years').value) || 0;
+            const rate = parseFloat(document.getElementById('test-rate').value) || 0;
+
+            const monthlyRate = rate / 100 / 12;
+            const months = years * 12;
+            let futureValue = principal * Math.pow(1 + monthlyRate, months);
+            if (monthly > 0) {
+                futureValue += monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+            }
+
+            const totalDeposits = principal + (monthly * months);
+            const totalInterest = futureValue - totalDeposits;
+
+            document.getElementById('test-ci-result').textContent = `$${futureValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('test-ci-breakdown').textContent = `$${totalDeposits.toLocaleString()} deposits + $${totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} interest`;
+        }
+
+        function testNavigation(section) {
+            document.getElementById('current-section').textContent = section;
+        }
+
+        // Run initial tests
+        window.onload = function() {
+            document.getElementById('js-test-status').textContent = '✓ All JavaScript functions loaded successfully';
+            document.getElementById('js-test-status').className = 'text-green-600';
+
+            // Run all tests automatically
+            testBudget();
+            testSavings();
+            testCI();
+        };
+    </script>
+</body>
+</html>

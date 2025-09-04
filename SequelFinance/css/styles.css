@@ -1,0 +1,50 @@
+/* Finance U Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* slate-50 */
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #3b82f6, #14b8a6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Custom animation for progress bars */
+@keyframes progress-bar-animation {
+    from { width: 0%; }
+}
+
+.animate-progress {
+    animation: progress-bar-animation 1.5s ease-out forwards;
+}
+
+/* Style for active nav link */
+.nav-link-active {
+    color: #14b8a6; /* teal-500 */
+    border-bottom: 2px solid #14b8a6;
+}
+
+.quiz-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.quiz-option.selected {
+    border-color: #3b82f6; /* blue-500 */
+    background-color: #eff6ff; /* blue-50 */
+}
+
+.quiz-option.correct {
+    border-color: #22c55e; /* green-500 */
+    background-color: #f0fdf4; /* green-50 */
+}
+
+.quiz-option.incorrect {
+    border-color: #ef4444; /* red-500 */
+    background-color: #fef2f2; /* red-50 */
+}
+
+.modal {
+    transition: opacity 0.25s ease;
+}

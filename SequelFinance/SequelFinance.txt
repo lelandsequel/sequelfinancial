@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance U: Level Up Your Money Skills</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #14b8a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom animation for progress bars */
+        @keyframes progress-bar-animation {
+            from { width: 0%; }
+        }
+        .animate-progress {
+            animation: progress-bar-animation 1.5s ease-out forwards;
+        }
+        /* Style for active nav link */
+        .nav-link-active {
+            color: #14b8a6; /* teal-500 */
+            border-bottom: 2px solid #14b8a6;
+        }
+        .quiz-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .quiz-option.selected {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .quiz-option.correct {
+            border-color: #22c55e; /* green-500 */
+            background-color: #f0fdf4; /* green-50 */
+        }
+        .quiz-option.incorrect {
+            border-color: #ef4444; /* red-500 */
+            background-color: #fef2f2; /* red-50 */
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2" onclick="showSection('dashboard', document.querySelector('.nav-link'))">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                <h1 class="text-2xl font-bold text-slate-900">Finance <span class="text-teal-500">U</span></h1>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-lg font-medium text-slate-600">
+                <a href="#dashboard" class="hover:text-teal-500 transition-colors nav-link nav-link-active" onclick="showSection('dashboard', this)">Dashboard</a>
+                <a href="#quests" class="hover:text-teal-500 transition-colors nav-link" onclick="showSection('quests', this)">Quests</a>
+                <a href="#lab" class="hover:text-teal-500 transition-colors nav-link" onclick="showSection('lab', this)">The Lab</a>
+                <a href="#real-world" class="hover:text-teal-500 transition-colors nav-link" onclick="showSection('real-world', this)">Real World</a>
+            </nav>
+            <button class="md:hidden" id="mobile-menu-button">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="#dashboard" class="block py-2 text-lg font-medium text-slate-600 hover:text-teal-500" onclick="showSection('dashboard')">Dashboard</a>
+            <a href="#quests" class="block py-2 text-lg font-medium text-slate-600 hover:text-teal-500" onclick="showSection('quests')">Quests</a>
+            <a href="#lab" class="block py-2 text-lg font-medium text-slate-600 hover:text-teal-500" onclick="showSection('lab')">The Lab</a>
+            <a href="#real-world" class="block py-2 text-lg font-medium text-slate-600 hover:text-teal-500" onclick="showSection('real-world')">Real World</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="app-section">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-6xl font-extrabold mb-4">Level Up Your <span class="gradient-text">Money Skills</span></h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">Welcome to your Financial HQ! Start quests, use powerful tools, and become a master of your own money.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- My Progress -->
+                <div class="md:col-span-2 bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-bold mb-6">Your Progress</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-medium">Total Quests Completed</span>
+                                <span class="font-bold text-teal-500" id="quests-completed-text">2 / 5</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-4">
+                                <div id="progress-bar" class="bg-teal-500 h-4 rounded-full animate-progress" style="width: 40%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3">Your Badges</h4>
+                            <div class="flex space-x-4" id="badge-collection">
+                                <div class="text-center p-3 bg-blue-100 rounded-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-blue-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                                    <span class="text-xs font-bold mt-1 block">Money Basics</span>
+                                </div>
+                                <div class="text-center p-3 bg-green-100 rounded-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-green-500"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M12 14h.01"></path><path d="M12 18h.01"></path><path d="M7 14h.01"></path><path d="M7 18h.01"></path><path d="M17 14h.01"></path><path d="M17 18h.01"></path></svg>
+                                    <span class="text-xs font-bold mt-1 block">Budget Boss</span>
+                                </div>
+                                <div id="savings-star-badge" class="text-center p-3 bg-slate-200 rounded-xl opacity-60">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-500"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                                    <span class="text-xs font-bold mt-1 block">Savings Star</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Start a Quest -->
+                <div class="bg-blue-500 text-white p-8 rounded-2xl shadow-lg flex flex-col justify-center items-center text-center border-4 border-blue-600">
+                    <h3 class="text-3xl font-bold mb-4">Ready to Start?</h3>
+                    <p class="mb-6">Jump into your next lesson and get closer to your financial goals.</p>
+                    <button onclick="showSection('quests')" class="bg-white text-blue-500 font-bold py-3 px-8 rounded-full text-lg hover:bg-blue-100 transition-all transform hover:scale-105">Start a Quest</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quests Section -->
+        <section id="quests" class="app-section hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Your Learning <span class="gradient-text">Quests</span></h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">Complete these modules to level up. Each quest unlocks new knowledge and gets you closer to earning awesome badges.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Quest Cards -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 text-blue-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+                        <h3 class="text-xl font-bold">Quest 1: Money Basics</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">What is money? How do you earn it? Let's cover the absolute fundamentals.</p>
+                    <div class="flex justify-between items-center text-green-500 font-bold">
+                        <span>Completed!</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 text-green-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg></div>
+                        <h3 class="text-xl font-bold">Quest 2: Art of the Budget</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">Learn where your money goes and how to tell it where to go instead. It's your superpower.</p>
+                    <div class="flex justify-between items-center text-green-500 font-bold">
+                        <span>Completed!</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                </div>
+                 <div id="quest-card-savings" class="bg-white p-6 rounded-2xl shadow-lg border-2 border-teal-400 flex flex-col relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-teal-400 text-white font-bold text-xs px-3 py-1 rounded-bl-lg">UP NEXT</div>
+                    <div class="flex items-center mb-4">
+                        <div class="bg-teal-100 text-teal-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg></div>
+                        <h3 class="text-xl font-bold">Quest 3: Savings 101</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">It's not about how much you make, it's about how much you keep. We'll show you how.</p>
+                    <button onclick="showQuestDetail('savings-101')" class="w-full bg-teal-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-600 transition-colors">Start Quest</button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col opacity-70">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-slate-200 text-slate-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+                        <h3 class="text-xl font-bold">Quest 4: Intro to Investing</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">Learn how to make your money work for you, even while you're sleeping.</p>
+                    <button class="w-full bg-slate-300 text-slate-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed">Locked</button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col opacity-70">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-slate-200 text-slate-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="12" x2="18" y2="12"></line></svg></div>
+                        <h3 class="text-xl font-bold">Quest 5: Debt & Credit</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">Understand the difference between good and bad debt. Use credit as a tool, not a trap.</p>
+                    <button class="w-full bg-slate-300 text-slate-500 font-bold py-3 px-6 rounded-lg cursor-not-allowed">Locked</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quest Detail Section (Savings 101) -->
+        <section id="quest-detail-savings-101" class="app-section hidden">
+            <button onclick="showSection('quests')" class="mb-8 font-semibold text-blue-500 hover:text-blue-700">&larr; Back to All Quests</button>
+            <div class="bg-white p-8 md:p-12 rounded-2xl shadow-lg border border-slate-200">
+                <div class="flex items-center mb-6">
+                    <div class="bg-teal-100 text-teal-500 p-4 rounded-full mr-6"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg></div>
+                    <h2 class="text-4xl font-extrabold">Quest 3: Savings 101</h2>
+                </div>
+                <div class="prose prose-lg max-w-none">
+                    <p class="text-xl">Welcome, future money wizard! Saving is one of the most important skills you can learn. It's not about being cheap; it's about being smart so you can afford the things that really matter to you. Let's get started.</p>
+                    
+                    <h3 class="font-bold text-2xl mt-8">Part 1: Why Save? (Pay Yourself First!)</h3>
+                    <p>Imagine you get $20 allowance. The first thing you might do is go buy snacks or a game. But what if you took just $2 and put it away first? That's called "paying yourself first." You're treating your future self as the most important bill you have to pay. This small habit makes a HUGE difference over time.</p>
+                    
+                    <h3 class="font-bold text-2xl mt-8">Part 2: The Magic of Compound Interest</h3>
+                    <p>This is where things get really cool. When you save money in a savings account, the bank pays you a little extra called <strong>interest</strong>. Compound interest is when you start earning interest on your interest! It's like a snowball rolling downhill—it starts small but gets bigger and bigger, faster and faster, all by itself.</p>
+                    <p>For example, if you save $100 and earn 5% interest, you'll have $105. Next year, you'll earn interest on the whole $105, not just the original $100. It doesn't sound like much, but over years, this becomes a superpower. You can play with our <a href="#" onclick="showSection('lab')">Compound Interest Calculator</a> in The Lab to see this in action!</p>
+                    
+                    <h3 class="font-bold text-2xl mt-8">Knowledge Check: Time for a Quick Quiz!</h3>
+                    <div id="quiz-savings-101" class="mt-6 space-y-8">
+                        <!-- Question 1 -->
+                        <div class="quiz-question" data-question="1" data-answer="b">
+                            <p class="text-xl font-semibold">1. What does "Pay Yourself First" mean?</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 1, 'a')">a) Buying whatever you want, whenever you want.</div>
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 1, 'b')">b) Putting a portion of your money into savings before you spend on anything else.</div>
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 1, 'c')">c) Only paying for things for your friends.</div>
+                            </div>
+                        </div>
+                        <!-- Question 2 -->
+                        <div class="quiz-question" data-question="2" data-answer="c">
+                            <p class="text-xl font-semibold">2. Compound interest is best described as...</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 2, 'a')">a) A really complicated math problem.</div>
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 2, 'b')">b) When the bank charges you a fee.</div>
+                                <div class="quiz-option border-2 border-slate-200 p-4 rounded-lg cursor-pointer transition-all" onclick="selectAnswer(this, 2, 'c')">c) Earning interest on your initial savings AND on the interest you've already earned.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="submit-quiz-btn" onclick="submitQuiz('savings-101')" class="mt-8 bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-blue-600 transition-colors disabled:bg-slate-400" disabled>Submit Answers</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Lab Section -->
+        <section id="lab" class="app-section hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Welcome to <span class="gradient-text">The Lab</span></h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">Play with financial concepts in a safe, risk-free environment. These interactive tools are here to help you learn by doing.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Budget Builder -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-bold mb-6">Budget Builder</h3>
+                    <div class="space-y-4" id="budget-items">
+                        <div class="flex gap-4">
+                            <input type="text" placeholder="Income Source (e.g. Allowance)" class="w-1/2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-type="income-name">
+                            <input type="number" placeholder="Amount" class="w-1/2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" data-type="income-amount">
+                        </div>
+                        <div class="flex gap-4">
+                            <input type="text" placeholder="Expense (e.g. Snacks)" class="w-1/2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" data-type="expense-name">
+                            <input type="number" placeholder="Amount" class="w-1/2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" data-type="expense-amount">
+                        </div>
+                    </div>
+                    <button id="add-expense-btn" class="mt-4 text-blue-500 font-semibold hover:text-blue-700">+ Add another expense</button>
+                    <div class="mt-6 border-t border-slate-200 pt-6">
+                        <div class="flex justify-between items-center text-xl font-bold">
+                            <span>Total Income:</span>
+                            <span class="text-green-500" id="total-income">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xl font-bold mt-2">
+                            <span>Total Expenses:</span>
+                            <span class="text-red-500" id="total-expenses">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-2xl font-extrabold mt-4 bg-slate-100 p-4 rounded-lg">
+                            <span>Remaining:</span>
+                            <span id="remaining-balance">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Savings Goal Calculator -->
+                 <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-bold mb-6">Savings Goal Calculator</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="goal-amount" class="block font-medium mb-1">How much do you need to save?</label>
+                            <input type="number" id="goal-amount" placeholder="$500" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label for="weekly-saving" class="block font-medium mb-1">How much can you save per week?</label>
+                            <input type="number" id="weekly-saving" placeholder="$25" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center bg-teal-50 p-6 rounded-lg">
+                        <p class="text-lg text-slate-700">It will take you</p>
+                        <p id="savings-result" class="text-4xl font-extrabold text-teal-500 my-2">-- weeks</p>
+                        <p class="text-lg text-slate-700">to reach your goal!</p>
+                    </div>
+                </div>
+                <!-- NEW: Compound Interest Calculator -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-bold mb-6">Compound Interest Calculator</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="ci-initial" class="block font-medium mb-1">Initial Deposit ($)</label>
+                            <input type="number" id="ci-initial" value="100" class="w-full p-3 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="ci-monthly" class="block font-medium mb-1">Monthly Contribution ($)</label>
+                            <input type="number" id="ci-monthly" value="25" class="w-full p-3 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="ci-years" class="block font-medium mb-1">Years to Grow</label>
+                            <input type="number" id="ci-years" value="10" class="w-full p-3 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="ci-rate" class="block font-medium mb-1">Est. Interest Rate (%)</label>
+                            <input type="number" id="ci-rate" value="5" class="w-full p-3 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center bg-blue-50 p-6 rounded-lg">
+                        <p class="text-lg text-slate-700">In 10 years, you will have</p>
+                        <p id="ci-result" class="text-4xl font-extrabold text-blue-500 my-2">$0.00</p>
+                        <p id="ci-breakdown" class="text-sm text-slate-600">which is $0 in deposits and $0 in interest.</p>
+                    </div>
+                </div>
+                <!-- UPDATED: Stock Market Simulator -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
+                        <h3 class="text-2xl font-bold">Stock Market Simulator</h3>
+                        <div class="text-right">
+                            <div class="font-bold text-lg">Cash: <span id="sim-cash" class="text-green-600">$10,000.00</span></div>
+                            <div class="font-bold text-lg">Portfolio: <span id="sim-portfolio-value">$0.00</span></div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="add-stock-ticker" placeholder="Enter Ticker (e.g. GOOGL)" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <button id="add-stock-btn" class="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors">Add</button>
+                    </div>
+                     <button id="refresh-prices-btn" class="w-full bg-slate-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-slate-700 transition-colors mb-6 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-5 w-5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        Refresh Prices
+                    </button>
+                    <div class="space-y-4 mb-6 border-t border-slate-200 pt-4">
+                        <!-- Stock rows will be injected by JS -->
+                        <div id="stock-market-list"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-2">Transaction Log</h4>
+                        <div id="transaction-log" class="text-sm h-24 overflow-y-auto bg-slate-100 p-2 rounded-lg text-slate-600">
+                            Welcome to the market!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real World Section -->
+        <section id="real-world" class="app-section hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4">The <span class="gradient-text">Real World</span></h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">Finance isn't just numbers, it's part of everyday life. Explore articles and videos that connect money to your world.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Blog Cards -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden group">
+                    <img src="https://placehold.co/600x400/3b82f6/ffffff?text=Side+Hustles" alt="Article image" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors">Side Hustles for Teens That Actually Work</h3>
+                        <p class="text-slate-600 mb-4">From mowing lawns to managing social media, here are some real ways to earn extra cash.</p>
+                        <a href="#" class="font-bold text-blue-500 hover:underline">Read More &rarr;</a>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden group">
+                    <img src="https://placehold.co/600x400/ef4444/ffffff?text=Prom+Costs" alt="Article image" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-red-500 transition-colors">The True Cost of a Prom Night</h3>
+                        <p class="text-slate-600 mb-4">Tickets, outfits, dinner... it adds up. We break down the costs and show you how to budget for the big night.</p>
+                        <a href="#" class="font-bold text-red-500 hover:underline">Read More &rarr;</a>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden group">
+                    <img src="https://placehold.co/600x400/14b8a6/ffffff?text=Sneaker+Savings" alt="Article image" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-teal-500 transition-colors">How to Save for Those Must-Have Sneakers</h3>
+                        <p class="text-slate-600 mb-4">Got your eye on the latest drop? Here's a savings plan to make them yours without going broke.</p>
+                        <a href="#" class="font-bold text-teal-500 hover:underline">Read More &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 mt-20">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 Finance U. An educational project inspired by the University of Houston.</p>
+            <p class="text-sm mt-2">This website is for educational purposes only. It is not financial advice.</p>
+        </div>
+    </footer>
+
+    <!-- Quiz Result Modal -->
+    <div id="quiz-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center transform transition-all scale-95">
+            <div id="modal-icon" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4">
+                <!-- Icon will be injected here -->
+            </div>
+            <h2 id="modal-title" class="text-3xl font-bold mb-2"></h2>
+            <p id="modal-message" class="text-slate-600 text-lg mb-6"></p>
+            <button id="modal-button" class="font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105">Continue</button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- State Management ---
+        let questsCompleted = 2;
+        const userAnswers = {};
+
+        // --- Mobile Menu ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // --- Single-Page App Navigation ---
+        const allSections = document.querySelectorAll('.app-section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function showSection(sectionId, clickedLink = null) {
+            allSections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            navLinks.forEach(link => {
+                link.classList.remove('nav-link-active');
+            });
+
+            const activeLink = clickedLink || document.querySelector(`.nav-link[href="#${sectionId}"]`);
+            if (activeLink) {
+                 activeLink.classList.add('nav-link-active');
+            }
+            
+            if(!mobileMenu.classList.contains('hidden')){
+                mobileMenu.classList.add('hidden');
+            }
+            window.scrollTo(0, 0);
+        }
+        
+        function showQuestDetail(questId) {
+            showSection(`quest-detail-${questId}`);
+        }
+
+        // --- Interactive Tools ---
+
+        // Budget Builder
+        const budgetItemsContainer = document.getElementById('budget-items');
+        const addExpenseBtn = document.getElementById('add-expense-btn');
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpensesEl = document.getElementById('total-expenses');
+        const remainingBalanceEl = document.getElementById('remaining-balance');
+
+        function calculateBudget() {
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            budgetItemsContainer.querySelectorAll('[data-type="income-amount"]').forEach(input => totalIncome += parseFloat(input.value) || 0);
+            budgetItemsContainer.querySelectorAll('[data-type="expense-amount"]').forEach(input => totalExpenses += parseFloat(input.value) || 0);
+            const remaining = totalIncome - totalExpenses;
+
+            totalIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
+            totalExpensesEl.textContent = `$${totalExpenses.toFixed(2)}`;
+            remainingBalanceEl.textContent = `$${remaining.toFixed(2)}`;
+
+            remainingBalanceEl.classList.toggle('text-red-500', remaining < 0);
+            remainingBalanceEl.classList.toggle('text-green-500', remaining > 0);
+            remainingBalanceEl.classList.toggle('text-slate-800', remaining === 0);
+        }
+
+        budgetItemsContainer.addEventListener('input', calculateBudget);
+
+        addExpenseBtn.addEventListener('click', () => {
+            const expenseRow = document.createElement('div');
+            expenseRow.className = 'flex gap-4 mt-2';
+            expenseRow.innerHTML = `<input type="text" placeholder="Expense" class="w-2/3 p-3 border border-slate-300 rounded-lg" data-type="expense-name"><input type="number" placeholder="Amount" class="w-1/3 p-3 border border-slate-300 rounded-lg" data-type="expense-amount">`;
+            budgetItemsContainer.appendChild(expenseRow);
+        });
+        
+        // Savings Goal Calculator
+        const goalAmountInput = document.getElementById('goal-amount');
+        const weeklySavingInput = document.getElementById('weekly-saving');
+        const savingsResultEl = document.getElementById('savings-result');
+
+        function calculateSavings() {
+            const goal = parseFloat(goalAmountInput.value);
+            const saving = parseFloat(weeklySavingInput.value);
+            if (goal > 0 && saving > 0) {
+                savingsResultEl.textContent = `${Math.ceil(goal / saving)} weeks`;
+            } else {
+                savingsResultEl.textContent = '-- weeks';
+            }
+        }
+        goalAmountInput.addEventListener('input', calculateSavings);
+        weeklySavingInput.addEventListener('input', calculateSavings);
+
+        // Compound Interest Calculator
+        const ciInputs = ['ci-initial', 'ci-monthly', 'ci-years', 'ci-rate'];
+        ciInputs.forEach(id => document.getElementById(id).addEventListener('input', calculateCI));
+
+        function calculateCI() {
+            const principal = parseFloat(document.getElementById('ci-initial').value) || 0;
+            const monthly = parseFloat(document.getElementById('ci-monthly').value) || 0;
+            const years = parseInt(document.getElementById('ci-years').value) || 0;
+            const rate = parseFloat(document.getElementById('ci-rate').value) || 0;
+
+            const monthlyRate = rate / 100 / 12;
+            const months = years * 12;
+            let futureValue = principal * Math.pow(1 + monthlyRate, months);
+            if (monthly > 0) {
+                futureValue += monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+            }
+            
+            const totalDeposits = principal + (monthly * months);
+            const totalInterest = futureValue - totalDeposits;
+
+            document.getElementById('ci-result').textContent = `$${futureValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('ci-breakdown').textContent = `which is $${totalDeposits.toLocaleString()} in deposits and $${totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} in interest.`;
+        }
+
+        // --- Stock Market Simulator v2 (with Gemini API) ---
+        const allStockData = {
+            'AAPL': { name: 'Apple Inc.', price: 0 },
+            'TSLA': { name: 'Tesla, Inc.', price: 0 },
+            'GME': { name: 'GameStop Corp.', price: 0 },
+            'NKE': { name: 'NIKE, Inc.', price: 0 },
+            'GOOGL': { name: 'Alphabet Inc.', price: 0 },
+            'AMZN': { name: 'Amazon.com, Inc.', price: 0 },
+            'MSFT': { name: 'Microsoft Corp.', price: 0 },
+            'DIS': { name: 'The Walt Disney Co.', price: 0 },
+            'SBUX': { name: 'Starbucks Corp.', price: 0 },
+            'MCD': { name: "McDonald's Corp.", price: 0 },
+            'NVDA': { name: 'NVIDIA Corp.', price: 0 },
+            'META': { name: 'Meta Platforms, Inc.', price: 0 },
+        };
+        let simCash = 10000;
+        const portfolio = {};
+        let visibleStocks = ['AAPL', 'TSLA']; // Stocks visible in the UI
+
+        const simCashEl = document.getElementById('sim-cash');
+        const simPortfolioValueEl = document.getElementById('sim-portfolio-value');
+        const stockListEl = document.getElementById('stock-market-list');
+        const logEl = document.getElementById('transaction-log');
+        const addStockTickerInput = document.getElementById('add-stock-ticker');
+        const addStockBtn = document.getElementById('add-stock-btn');
+        const refreshBtn = document.getElementById('refresh-prices-btn');
+
+        // Gemini API Call Function with Exponential Backoff
+        async function fetchStockPrice(ticker) {
+            const apiKey = ""; // API key will be injected by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: `What is the current stock price of ${ticker}? Respond with only the price, like '$123.45'.` }] }],
+                tools: [{ "google_search": {} }],
+            };
+
+            let response;
+            let delay = 1000; // Start with 1 second
+            for (let i = 0; i < 5; i++) { // Retry up to 5 times
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) {
+                            const priceMatch = text.match(/\$?([\d,]+\.\d+)/);
+                            if (priceMatch && priceMatch[1]) {
+                                return parseFloat(priceMatch[1].replace(/,/g, ''));
+                            }
+                        }
+                        throw new Error("Could not parse price from API response.");
+                    } else if (response.status === 429) { // Throttling
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Double the delay for the next retry
+                    } else {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+                } catch (error) {
+                    if (i === 4) { // Last retry failed
+                         logTransaction(`Error fetching price for ${ticker}: ${error.message}`, 'error');
+                         return null;
+                    }
+                     await new Promise(resolve => setTimeout(resolve, delay));
+                     delay *= 2;
+                }
+            }
+            return null;
+        }
+
+
+        function renderSimulator() {
+            simCashEl.textContent = `$${simCash.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            let portfolioValue = 0;
+            stockListEl.innerHTML = '';
+
+            visibleStocks.forEach(ticker => {
+                const stock = allStockData[ticker];
+                const sharesOwned = portfolio[ticker] || 0;
+                 if (stock.price > 0) {
+                    portfolioValue += sharesOwned * stock.price;
+                }
+
+                const priceDisplay = stock.price > 0 ? `$${stock.price.toFixed(2)}` : 'Fetching...';
+
+                stockListEl.innerHTML += `
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 items-center p-2 rounded-lg hover:bg-slate-50">
+                        <div class="md:col-span-2">
+                            <div class="font-bold">${ticker}</div>
+                            <div class="text-sm text-slate-500">${stock.name}</div>
+                        </div>
+                        <div class="font-semibold text-center">${priceDisplay}</div>
+                        <div class="text-center font-bold">${sharesOwned} Shares</div>
+                        <div class="flex gap-2 items-center">
+                            <input type="number" value="1" min="1" class="w-16 p-2 border border-slate-300 rounded-md text-center" id="qty-${ticker}">
+                            <div class="flex flex-col gap-1 w-full">
+                                <button onclick="buyStock('${ticker}')" class="w-full bg-green-500 text-white text-xs font-bold p-1 rounded-md hover:bg-green-600 disabled:opacity-50" ${stock.price <= 0 ? 'disabled' : ''}>Buy</button>
+                                <button onclick="sellStock('${ticker}')" class="w-full bg-red-500 text-white text-xs font-bold p-1 rounded-md hover:bg-red-600 ${sharesOwned > 0 && stock.price > 0 ? '' : 'opacity-50 cursor-not-allowed'}" ${sharesOwned > 0 && stock.price > 0 ? '' : 'disabled'}>Sell</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            simPortfolioValueEl.textContent = `$${portfolioValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function logTransaction(message, type = 'info') {
+             const color = type === 'error' ? 'text-red-500' : 'text-slate-600';
+            logEl.innerHTML = `<div class="${color}">${new Date().toLocaleTimeString()}: ${message}</div>` + logEl.innerHTML;
+        }
+
+        function buyStock(ticker) {
+            const qty = parseInt(document.getElementById(`qty-${ticker}`).value) || 1;
+            const price = allStockData[ticker].price;
+            if (price <= 0) {
+                 logTransaction(`Cannot buy ${ticker}, price not available.`, 'error');
+                 return;
+            }
+            const cost = price * qty;
+
+            if (simCash >= cost) {
+                simCash -= cost;
+                portfolio[ticker] = (portfolio[ticker] || 0) + qty;
+                logTransaction(`Bought ${qty} share(s) of ${ticker} for $${cost.toFixed(2)}.`);
+                renderSimulator();
+            } else {
+                logTransaction(`Not enough cash to buy ${qty} share(s) of ${ticker}.`, 'error');
+            }
+        }
+        function sellStock(ticker) {
+            const qty = parseInt(document.getElementById(`qty-${ticker}`).value) || 1;
+            const sharesOwned = portfolio[ticker] || 0;
+
+            if (qty > sharesOwned) {
+                logTransaction(`You can't sell more ${ticker} shares than you own.`, 'error');
+                return;
+            }
+            
+            const price = allStockData[ticker].price;
+             if (price <= 0) {
+                 logTransaction(`Cannot sell ${ticker}, price not available.`, 'error');
+                 return;
+            }
+
+            if (sharesOwned > 0 && qty > 0) {
+                const value = price * qty;
+                simCash += value;
+                portfolio[ticker] -= qty;
+                logTransaction(`Sold ${qty} share(s) of ${ticker} for $${value.toFixed(2)}.`);
+                renderSimulator();
+            }
+        }
+
+        async function addStockToSimulator() {
+            const ticker = addStockTickerInput.value.toUpperCase().trim();
+            if (!ticker) return;
+
+            addStockBtn.disabled = true;
+            addStockBtn.textContent = 'Adding...';
+
+            if (allStockData[ticker]) {
+                if (!visibleStocks.includes(ticker)) {
+                    visibleStocks.push(ticker);
+                    logTransaction(`Added ${ticker} to the simulator. Fetching price...`);
+                    renderSimulator(); // Render immediately to show "Fetching..."
+                    const price = await fetchStockPrice(ticker);
+                    if (price !== null) {
+                        allStockData[ticker].price = price;
+                        logTransaction(`Initial price for ${ticker} is $${price.toFixed(2)}.`);
+                    } else {
+                         visibleStocks.pop(); // remove if fetch fails
+                    }
+                    renderSimulator();
+                } else {
+                    logTransaction(`${ticker} is already in the simulator.`, 'error');
+                }
+            } else {
+                logTransaction(`${ticker} is not an available stock in this simulation.`, 'error');
+            }
+            addStockTickerInput.value = '';
+            addStockBtn.disabled = false;
+            addStockBtn.textContent = 'Add';
+        }
+
+        addStockBtn.addEventListener('click', addStockToSimulator);
+        addStockTickerInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addStockToSimulator();
+            }
+        });
+
+        async function refreshAllStockPrices() {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin mr-2 h-5 w-5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Refreshing...`;
+            logTransaction('Refreshing all stock prices...');
+
+            const pricePromises = visibleStocks.map(ticker => fetchStockPrice(ticker));
+            const prices = await Promise.all(pricePromises);
+
+            prices.forEach((price, index) => {
+                const ticker = visibleStocks[index];
+                if (price !== null) {
+                    allStockData[ticker].price = price;
+                }
+            });
+
+            renderSimulator();
+            logTransaction('Finished refreshing prices.');
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-5 w-5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Refresh Prices`;
+        }
+
+        refreshBtn.addEventListener('click', refreshAllStockPrices);
+
+        // --- Quest & Quiz Logic ---
+        function selectAnswer(element, questionNumber, answer) {
+            userAnswers[questionNumber] = answer;
+            const questionDiv = element.closest('.quiz-question');
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // Enable submit button when all questions are answered
+            if (Object.keys(userAnswers).length === questionDiv.parentElement.querySelectorAll('.quiz-question').length) {
+                document.getElementById('submit-quiz-btn').disabled = false;
+            }
+        }
+
+        function submitQuiz(quizId) {
+            const quizEl = document.getElementById(`quiz-${quizId}`);
+            let score = 0;
+            quizEl.querySelectorAll('.quiz-question').forEach(q => {
+                const questionNumber = q.dataset.question;
+                const correctAnswer = q.dataset.answer;
+                const userAnswer = userAnswers[questionNumber];
+                const options = q.querySelectorAll('.quiz-option');
+
+                options.forEach(opt => {
+                    const optAnswer = opt.getAttribute('onclick').split("'")[3];
+                    opt.classList.remove('selected');
+                    opt.style.pointerEvents = 'none'; // Disable clicking after submission
+                    if (optAnswer === correctAnswer) {
+                        opt.classList.add('correct');
+                    } else if (optAnswer === userAnswer) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+
+                if (userAnswer === correctAnswer) {
+                    score++;
+                }
+            });
+            
+            const totalQuestions = quizEl.querySelectorAll('.quiz-question').length;
+            showQuizResult(score, totalQuestions, quizId);
+        }
+
+        function showQuizResult(score, total, quizId) {
+            const modal = document.getElementById('quiz-modal');
+            const iconEl = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const messageEl = document.getElementById('modal-message');
+            const buttonEl = document.getElementById('modal-button');
+            
+            if (score === total) {
+                iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+                iconEl.className = 'w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 bg-green-500';
+                titleEl.textContent = 'Quest Complete!';
+                messageEl.textContent = `Amazing! You scored ${score}/${total}. You've earned the "Savings Star" badge!`;
+                buttonEl.textContent = 'Back to Quests';
+                buttonEl.className = 'bg-green-500 text-white font-bold py-3 px-8 rounded-full text-lg';
+                buttonEl.onclick = () => { completeQuest(quizId); modal.classList.add('hidden'); };
+            } else {
+                iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+                iconEl.className = 'w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 bg-yellow-500';
+                titleEl.textContent = 'Almost There!';
+                messageEl.textContent = `You scored ${score}/${total}. Review the answers and try again to earn your badge!`;
+                buttonEl.textContent = 'Try Again';
+                buttonEl.className = 'bg-yellow-500 text-white font-bold py-3 px-8 rounded-full text-lg';
+                buttonEl.onclick = () => { resetQuiz(quizId); modal.classList.add('hidden'); };
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('div > div').classList.remove('scale-95'), 10);
+        }
+
+        function completeQuest(questId) {
+            if (questId === 'savings-101') {
+                questsCompleted = 3;
+                document.getElementById('quest-card-savings').innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <div class="bg-teal-100 text-teal-500 p-3 rounded-full mr-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg></div>
+                        <h3 class="text-xl font-bold">Quest 3: Savings 101</h3>
+                    </div>
+                    <p class="text-slate-600 mb-4 flex-grow">It's not about how much you make, it's about how much you keep. We'll show you how.</p>
+                    <div class="flex justify-between items-center text-green-500 font-bold">
+                        <span>Completed!</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>`;
+                
+                const badge = document.getElementById('savings-star-badge');
+                badge.classList.remove('bg-slate-200', 'opacity-60');
+                badge.classList.add('bg-teal-100');
+                badge.querySelector('svg').classList.remove('text-slate-500');
+                badge.querySelector('svg').classList.add('text-teal-500');
+                
+                updateProgress();
+                showSection('quests');
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('quests-completed-text').textContent = `${questsCompleted} / 5`;
+            document.getElementById('progress-bar').style.width = `${(questsCompleted / 5) * 100}%`;
+        }
+
+        function resetQuiz(quizId) {
+             const quizEl = document.getElementById(`quiz-${quizId}`);
+             quizEl.querySelectorAll('.quiz-question').forEach(q => {
+                q.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                    opt.style.pointerEvents = 'auto';
+                });
+             });
+             userAnswers = {};
+             document.getElementById('submit-quiz-btn').disabled = true;
+        }
+
+
+        // --- Initialize On Load ---
+        function initializeApp() {
+            calculateBudget();
+            calculateSavings();
+            calculateCI();
+            renderSimulator();
+            updateProgress();
+            refreshAllStockPrices(); // Fetch initial prices on load
+        }
+
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
+
+

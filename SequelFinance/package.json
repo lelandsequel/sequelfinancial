@@ -1,0 +1,32 @@
+{
+  "name": "finance-u",
+  "version": "1.0.0",
+  "description": "Financial education platform for young learners",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8080",
+    "dev": "http-server -p 8080 -c-1 --cors",
+    "build": "echo 'No build step required for static site'",
+    "deploy": "echo 'Ready for deployment to GitHub Pages, Netlify, or Vercel'"
+  },
+  "keywords": [
+    "finance",
+    "education",
+    "budgeting",
+    "investing",
+    "financial-literacy"
+  ],
+  "author": "Finance U Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/finance-u.git"
+  },
+  "homepage": "https://username.github.io/finance-u",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
