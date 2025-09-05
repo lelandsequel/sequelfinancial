@@ -3,22 +3,41 @@
 let questsCompleted = 2;
 const userAnswers = {};
 
-// --- Mobile Menu ---
-const mobileMenuButton = document.getElementById('mobile-menu-button');
-const mobileMenu = document.getElementById('mobile-menu');
-mobileMenuButton.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-});
+// --- Global Variables (will be initialized in initializeApp) ---
+let mobileMenuButton, mobileMenu, allSections, navLinks;
+let simCashEl, simPortfolioValueEl, stockListEl, logEl, addStockTickerInput, addStockBtn, refreshBtn;
+let stockSearchInput, sectorFilter, stockSuggestions;
 
-// --- Single-Page App Navigation ---
-const allSections = document.querySelectorAll('.app-section');
-const navLinks = document.querySelectorAll('.nav-link');
+// Budget calculator elements
+let budgetItemsContainer, addExpenseBtn, totalIncomeEl, totalExpensesEl, remainingBalanceEl;
+
+// Savings calculator elements
+let goalAmountInput, weeklySavingInput, savingsResultEl;
+
+// Compound interest elements
+let ciInputs;
 
 function showSection(sectionId, clickedLink = null) {
+    console.log('🔄 showSection called with:', sectionId);
+
+    if (!allSections || allSections.length === 0) {
+        console.error('❌ allSections not found or empty');
+        allSections = document.querySelectorAll('.app-section');
+        console.log('🔄 Re-initialized allSections:', allSections.length, 'sections found');
+    }
+
     allSections.forEach(section => {
         section.classList.add('hidden');
     });
-    document.getElementById(sectionId).classList.remove('hidden');
+
+    const targetSection = document.getElementById(sectionId);
+    if (!targetSection) {
+        console.error('❌ Target section not found:', sectionId);
+        console.log('📋 Available sections:', Array.from(allSections).map(s => s.id));
+        return;
+    }
+    targetSection.classList.remove('hidden');
+    console.log('✅ Section shown:', sectionId);
 
     navLinks.forEach(link => {
         link.classList.remove('nav-link-active');
@@ -46,13 +65,7 @@ function showQuestDetail(questId) {
 }
 
 // --- Interactive Tools ---
-
-// Budget Builder
-const budgetItemsContainer = document.getElementById('budget-items');
-const addExpenseBtn = document.getElementById('add-expense-btn');
-const totalIncomeEl = document.getElementById('total-income');
-const totalExpensesEl = document.getElementById('total-expenses');
-const remainingBalanceEl = document.getElementById('remaining-balance');
+// DOM elements will be initialized in initializeApp()
 
 function calculateBudget() {
     let totalIncome = 0;
@@ -79,10 +92,7 @@ addExpenseBtn.addEventListener('click', () => {
     budgetItemsContainer.appendChild(expenseRow);
 });
 
-// Savings Goal Calculator
-const goalAmountInput = document.getElementById('goal-amount');
-const weeklySavingInput = document.getElementById('weekly-saving');
-const savingsResultEl = document.getElementById('savings-result');
+// Savings Goal Calculator - DOM elements initialized in initializeApp()
 
 function calculateSavings() {
     const goal = parseFloat(goalAmountInput.value);
@@ -96,9 +106,7 @@ function calculateSavings() {
 goalAmountInput.addEventListener('input', calculateSavings);
 weeklySavingInput.addEventListener('input', calculateSavings);
 
-// Compound Interest Calculator
-const ciInputs = ['ci-initial', 'ci-monthly', 'ci-years', 'ci-rate'];
-ciInputs.forEach(id => document.getElementById(id).addEventListener('input', calculateCI));
+// Compound Interest Calculator - DOM elements initialized in initializeApp()
 
 function calculateCI() {
     const principal = parseFloat(document.getElementById('ci-initial').value) || 0;
@@ -142,18 +150,7 @@ let userTier = window.USER_CONFIG.currentTier;
 let dailyStockUpdates = 0;
 let monthlyStockUpdates = 0;
 
-const simCashEl = document.getElementById('sim-cash');
-const simPortfolioValueEl = document.getElementById('sim-portfolio-value');
-const stockListEl = document.getElementById('stock-market-list');
-const logEl = document.getElementById('transaction-log');
-const addStockTickerInput = document.getElementById('add-stock-ticker');
-const addStockBtn = document.getElementById('add-stock-btn');
-const refreshBtn = document.getElementById('refresh-prices-btn');
-
-// New search/filter elements
-const stockSearchInput = document.getElementById('stock-search');
-const sectorFilter = document.getElementById('sector-filter');
-const stockSuggestions = document.getElementById('stock-suggestions');
+// DOM elements will be initialized in initializeApp()
 
 // Gemini API Call Function with Exponential Backoff
 // Demo stock prices for when API key isn't configured
@@ -1242,6 +1239,106 @@ function resetQuiz(quizId) {
 
 // --- Initialize On Load ---
 function initializeApp() {
+    console.log('🚀 Finance U initializing...');
+
+    // Initialize DOM element references
+    mobileMenuButton = document.getElementById('mobile-menu-button');
+    mobileMenu = document.getElementById('mobile-menu');
+    allSections = document.querySelectorAll('.app-section');
+    navLinks = document.querySelectorAll('.nav-link');
+
+    // Stock simulator elements
+    simCashEl = document.getElementById('sim-cash');
+    simPortfolioValueEl = document.getElementById('sim-portfolio-value');
+    stockListEl = document.getElementById('stock-market-list');
+    logEl = document.getElementById('transaction-log');
+    addStockTickerInput = document.getElementById('add-stock-ticker');
+    addStockBtn = document.getElementById('add-stock-btn');
+    refreshBtn = document.getElementById('refresh-prices-btn');
+    stockSearchInput = document.getElementById('stock-search');
+    sectorFilter = document.getElementById('sector-filter');
+    stockSuggestions = document.getElementById('stock-suggestions');
+
+    // Budget calculator elements
+    budgetItemsContainer = document.getElementById('budget-items');
+    addExpenseBtn = document.getElementById('add-expense-btn');
+    totalIncomeEl = document.getElementById('total-income');
+    totalExpensesEl = document.getElementById('total-expenses');
+    remainingBalanceEl = document.getElementById('remaining-balance');
+
+    // Savings calculator elements
+    goalAmountInput = document.getElementById('goal-amount');
+    weeklySavingInput = document.getElementById('weekly-saving');
+    savingsResultEl = document.getElementById('savings-result');
+
+    // Compound interest elements
+    ciInputs = ['ci-initial', 'ci-monthly', 'ci-years', 'ci-rate'];
+
+    // Set up mobile menu event listener
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Set up event listeners
+    if (addExpenseBtn) {
+        addExpenseBtn.addEventListener('click', () => {
+            const expenseRow = document.createElement('div');
+            expenseRow.className = 'flex gap-4 mt-2';
+            expenseRow.innerHTML = `<input type="text" placeholder="Expense" class="w-2/3 p-3 border border-slate-300 rounded-lg" data-type="expense-name"><input type="number" placeholder="Amount" class="w-1/3 p-3 border border-slate-300 rounded-lg" data-type="expense-amount">`;
+            if (budgetItemsContainer) budgetItemsContainer.appendChild(expenseRow);
+        });
+    }
+
+    if (goalAmountInput) goalAmountInput.addEventListener('input', calculateSavings);
+    if (weeklySavingInput) weeklySavingInput.addEventListener('input', calculateSavings);
+
+    if (ciInputs) {
+        ciInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.addEventListener('input', calculateCI);
+        });
+    }
+
+    if (addStockBtn) addStockBtn.addEventListener('click', addStockToSimulator);
+    if (addStockTickerInput) {
+        addStockTickerInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addStockToSimulator();
+            }
+        });
+    }
+    if (refreshBtn) refreshBtn.addEventListener('click', refreshAllStockPrices);
+
+    // Search and filter event listeners
+    if (stockSearchInput) {
+        stockSearchInput.addEventListener('input', (e) => {
+            updateStockSuggestions(e.target.value);
+        });
+        stockSearchInput.addEventListener('focus', () => {
+            if (stockSuggestions) stockSuggestions.classList.remove('hidden');
+        });
+        stockSearchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (stockSuggestions) stockSuggestions.classList.add('hidden');
+            }, 150);
+        });
+    }
+
+    if (sectorFilter) {
+        sectorFilter.addEventListener('change', () => {
+            updateStockSuggestions(stockSearchInput ? stockSearchInput.value : '');
+        });
+    }
+
+    // Click outside to close suggestions
+    document.addEventListener('click', (e) => {
+        if (stockSuggestions && !stockSuggestions.contains(e.target) && e.target !== stockSearchInput) {
+            stockSuggestions.classList.add('hidden');
+        }
+    });
+
     calculateBudget();
     calculateSavings();
     calculateCI();
@@ -1265,6 +1362,30 @@ function initializeApp() {
         logTransaction('🔗 Connected to Gemini API. Loading real stock prices...', 'info');
         refreshAllStockPrices(); // Fetch initial prices on load
     }
+
+    console.log('✅ Finance U initialization complete!');
 }
 
-window.onload = initializeApp;
+// Initialize on load
+window.onload = function() {
+    console.log('📱 Window loaded, starting Finance U...');
+    initializeApp();
+};
+
+// Fallback initialization in case window.onload doesn't fire
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 DOM loaded, initializing Finance U...');
+        if (!window.financeUInitialized) {
+            initializeApp();
+            window.financeUInitialized = true;
+        }
+    });
+} else {
+    // DOM already loaded
+    console.log('📄 DOM already loaded, initializing Finance U...');
+    if (!window.financeUInitialized) {
+        initializeApp();
+        window.financeUInitialized = true;
+    }
+}

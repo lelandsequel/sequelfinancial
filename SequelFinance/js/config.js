@@ -21,7 +21,7 @@ window.APP_CONFIG = {
 
 // User Tier Management
 window.USER_CONFIG = {
-    currentTier: 'free', // 'free', 'premium', 'enterprise'
+    currentTier: 'premium', // 'free', 'premium', 'enterprise'
     features: {
         free: {
             maxStocks: 10,
