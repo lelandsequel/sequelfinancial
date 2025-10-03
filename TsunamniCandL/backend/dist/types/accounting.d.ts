@@ -33,6 +33,16 @@ export declare enum TransactionType {
     ADJUSTMENTS = "ADJUSTMENTS",
     DEPRECIATION = "DEPRECIATION"
 }
+export declare enum PeriodType {
+    MONTHLY = "MONTHLY",
+    QUARTERLY = "QUARTERLY",
+    ANNUAL = "ANNUAL"
+}
+export declare enum PeriodStatus {
+    OPEN = "OPEN",
+    CLOSED = "CLOSED",
+    LOCKED = "LOCKED"
+}
 export interface Asset {
     id: string;
     name: string;
@@ -192,6 +202,43 @@ export interface UpdateChartOfAccountsInput {
     parentId?: string;
     description?: string;
 }
+export interface Period {
+    id: string;
+    name: string;
+    type: PeriodType;
+    status: PeriodStatus;
+    startDate: Date;
+    endDate: Date;
+    isCurrent: boolean;
+    closedBy?: string;
+    closedAt?: Date;
+    notes?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+export interface CreatePeriodInput {
+    name: string;
+    type: PeriodType;
+    startDate: Date;
+    endDate: Date;
+    notes?: string;
+}
+export interface UpdatePeriodInput {
+    name?: string;
+    status?: PeriodStatus;
+    closedBy?: string;
+    closedAt?: Date;
+    notes?: string;
+}
+export interface PeriodClosingResult {
+    periodId: string;
+    closedAt: Date;
+    closedBy: string;
+    adjustmentsCount: number;
+    retainedEarningsAdjustment: Decimal;
+    success: boolean;
+    message: string;
+}
 export interface Transaction {
     id: string;
     type: TransactionType;
@@ -200,6 +247,8 @@ export interface Transaction {
     date: Date;
     isBalanced: boolean;
     reference?: string;
+    periodId: string;
+    period?: Period;
     assetId?: string;
     liabilityId?: string;
     equityId?: string;
@@ -214,6 +263,7 @@ export interface CreateTransactionInput {
     description: string;
     amount: Decimal;
     date: Date;
+    periodId: string;
     reference?: string;
     assetId?: string;
     liabilityId?: string;
@@ -249,6 +299,13 @@ export interface CreateJournalEntryInput {
     debit?: Decimal;
     credit?: Decimal;
     description?: string;
+}
+export interface FinancialRatios {
+    currentRatio: string;
+    debtToEquityRatio: string;
+    profitMargin: string;
+    returnOnAssets: string;
+    returnOnEquity: string;
 }
 export interface TransactionValidationResult {
     isValid: boolean;

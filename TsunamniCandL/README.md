@@ -5,6 +5,7 @@ A comprehensive double-entry accounting system built with modern technologies, i
 ## 🎯 Phase 1: FOUNDATIONAL DATA ARCHITECTURE - COMPLETED ✅
 ## 🎯 Phase 2: TRANSACTION ENGINE - COMPLETED ✅
 ## 🎯 Phase 3: USER INTERFACE - COMPLETED ✅
+## 🎯 Phase 4: BUSINESS LOGIC - COMPLETED ✅
 
 ### Double-Entry Bookkeeping System
 - **Complete Transaction Engine**: Full double-entry accounting with automatic debit/credit validation
@@ -134,6 +135,51 @@ Expenses (5000-5999)
 - **Recent Activity**: Latest transactions and account balances
 - **Status Monitoring**: Balance validation with error alerts
 
+## 📊 Phase 4: BUSINESS LOGIC - COMPLETED ✅
+
+### Accounting Period Management
+- **Monthly/Quarterly/Annual Periods**: Flexible period structures for different reporting needs
+- **Period Lifecycle**: Open → Closed → Locked workflow with status tracking
+- **Automatic Period Creation**: Next period automatically created when current period closes
+- **Period Validation**: Ensures all transactions are balanced before closing
+
+### Financial Statement Generation
+- **Income Statement**: Revenue minus expenses with net income calculation
+- **Balance Sheet**: Assets, liabilities, and equity snapshot at any date
+- **Cash Flow Statement**: Operating, investing, and financing cash flow analysis
+- **Comparative Reports**: Period-over-period analysis and trend reporting
+
+### Advanced Business Logic
+- **Accrual & Deferral Entries**: Automated adjusting entries for period-end accruals
+- **Retained Earnings Calculation**: Automatic calculation and adjustment of retained earnings
+- **Financial Ratios**: Current ratio, debt-to-equity, return on assets, return on equity
+- **Profit/Loss Analysis**: Trend analysis and period-over-period comparisons
+
+### Period-End Closing Procedures
+- **Transaction Validation**: Ensures all transactions are balanced before closing
+- **Automatic Adjustments**: Creates necessary adjusting entries for accruals/deferrals
+- **Retained Earnings Updates**: Transfers net income to retained earnings
+- **Audit Trail**: Complete record of all closing activities and adjustments
+
+### API Endpoints (Phase 4)
+```
+GET    /api/periods                    # List all periods
+GET    /api/periods/current           # Get current period
+POST   /api/periods                   # Create new period
+POST   /api/periods/:id/close         # Close accounting period
+GET    /api/periods/:id/summary       # Get period financial summary
+
+GET    /api/business-logic/financial-ratios                    # Calculate financial ratios
+GET    /api/business-logic/income-statement/:periodId          # Generate income statement
+GET    /api/business-logic/balance-sheet                       # Generate balance sheet
+GET    /api/business-logic/cash-flow/:periodId                 # Generate cash flow statement
+POST   /api/business-logic/accruals/:periodId                  # Create accrual entries
+GET    /api/business-logic/comparative-report                  # Generate comparative reports
+GET    /api/business-logic/financial-statements/:periodId      # Get all financial statements
+GET    /api/business-logic/profit-loss-analysis                # Profit/loss trend analysis
+GET    /api/business-logic/revenue-expense-breakdown           # Revenue/expense category breakdown
+```
+
 ### Core Entity Structure
 
 #### 1. ASSETS Table
@@ -215,6 +261,8 @@ Expenses (5000-5999)
 - **Expenses Table**: Stores cost outflows
 - **Transactions Table**: For double-entry bookkeeping (Phase 2)
 - **Journal Entries Table**: For detailed transaction records (Phase 2)
+- **Periods Table**: Accounting period management (Phase 4)
+- **Chart of Accounts Table**: Hierarchical account structure (Phase 2)
 
 ## 🚀 Getting Started
 
@@ -357,7 +405,7 @@ This project implements fundamental accounting principles and is intended for ed
 
 **Phase 3 Complete**: Professional React frontend implemented with real-time dashboard, guided transaction wizard, and comprehensive financial analytics. Ready for Phase 4: Business Logic Enhancements.
 
-## 🎯 Success Metrics Achieved (Phases 1, 2 & 3)
+## 🎯 Success Metrics Achieved (Phases 1, 2, 3 & 4)
 
 - ✅ Accounting equation always balances (Assets = Liabilities + Equity)
 - ✅ Double-entry compliance with automatic validation
@@ -376,3 +424,11 @@ This project implements fundamental accounting principles and is intended for ed
 - ✅ React Query state management with caching
 - ✅ Form validation with React Hook Form + Zod
 - ✅ Modern development workflow with Vite
+- ✅ Accounting period management with lifecycle tracking
+- ✅ Financial statement generation (Income, Balance Sheet, Cash Flow)
+- ✅ Automated period-end closing procedures with validation
+- ✅ Accrual and deferral entry automation
+- ✅ Advanced financial ratios and trend analysis
+- ✅ Comparative reporting across accounting periods
+- ✅ Retained earnings calculation and adjustment automation
+- ✅ Complete business logic service layer for complex calculations

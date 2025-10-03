@@ -114,13 +114,29 @@ router.get('/:id/balance/:accountId', async (req, res) => {
 // POST /api/transactions - Create new transaction with journal entries
 router.post('/', async (req, res) => {
   try {
-    const { type, description, amount, date, reference, assetId, liabilityId, equityId, revenueId, expenseId, journalEntries } = req.body;
+    const { type, description, amount, date, periodId, reference, assetId, liabilityId, equityId, revenueId, expenseId, journalEntries } = req.body;
+
+    // If no periodId provided, get the current period
+    let transactionPeriodId = periodId;
+    if (!transactionPeriodId) {
+      const { PeriodService } = await import('../services/periodService');
+      const currentPeriodResult = await PeriodService.getCurrentPeriod();
+      if (currentPeriodResult.success) {
+        transactionPeriodId = currentPeriodResult.data!.id;
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'No period specified and no current period found'
+        });
+      }
+    }
 
     const result = await TransactionService.createTransaction({
       type: type as TransactionType,
       description,
       amount,
       date: new Date(date),
+      periodId: transactionPeriodId,
       reference,
       assetId,
       liabilityId,

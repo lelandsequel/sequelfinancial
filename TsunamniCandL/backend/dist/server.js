@@ -13,6 +13,8 @@ const revenueRoutes_1 = require("./routes/revenueRoutes");
 const expenseRoutes_1 = require("./routes/expenseRoutes");
 const chartOfAccountsRoutes_1 = require("./routes/chartOfAccountsRoutes");
 const transactionRoutes_1 = require("./routes/transactionRoutes");
+const periodRoutes_1 = require("./routes/periodRoutes");
+const businessLogicRoutes_1 = require("./routes/businessLogicRoutes");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
 // Middleware
@@ -39,6 +41,8 @@ app.use('/api/revenue', revenueRoutes_1.revenueRoutes);
 app.use('/api/expenses', expenseRoutes_1.expenseRoutes);
 app.use('/api/chart-of-accounts', chartOfAccountsRoutes_1.chartOfAccountsRoutes);
 app.use('/api/transactions', transactionRoutes_1.transactionRoutes);
+app.use('/api/periods', periodRoutes_1.periodRoutes);
+app.use('/api/business-logic', businessLogicRoutes_1.businessLogicRoutes);
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({

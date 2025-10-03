@@ -1,4 +1,4 @@
-import { PrismaClient, AssetType, LiabilityType, EquityType, AccountType, AccountStatus, TransactionType } from '@prisma/client';
+import { PrismaClient, AssetType, LiabilityType, EquityType, AccountType, AccountStatus, TransactionType, PeriodType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 const prisma = new PrismaClient();
@@ -199,6 +199,33 @@ async function main() {
 
   const chartOfAccounts = [...parentAccounts, ...childAccounts];
 
+  // Create accounting periods
+  console.log('📅 Creating accounting periods...');
+  const currentYear = new Date().getFullYear();
+
+  // Create monthly periods for current year
+  const periods = [];
+  for (let month = 0; month < 12; month++) {
+    const startDate = new Date(currentYear, month, 1);
+    const endDate = new Date(currentYear, month + 1, 0);
+
+    const monthName = startDate.toLocaleString('default', { month: 'long' });
+    const isCurrentMonth = month === new Date().getMonth();
+
+    periods.push(await prisma.period.create({
+      data: {
+        name: `${monthName} ${currentYear}`,
+        type: PeriodType.MONTHLY,
+        startDate,
+        endDate,
+        isCurrent: isCurrentMonth
+      }
+    }));
+  }
+
+  // Get current period for transactions
+  const currentPeriod = periods.find(p => p.isCurrent);
+
   // Create sample assets
   console.log('📦 Creating sample assets...');
   const assets = await Promise.all([
@@ -375,13 +402,98 @@ async function main() {
     })
   ]);
 
+  // Create sample transactions (double-entry bookkeeping)
+  console.log('💳 Creating sample transactions...');
+  const transactions = await Promise.all([
+    // Sales transaction: Customer pays for services
+    prisma.transaction.create({
+      data: {
+        type: TransactionType.SALES,
+        description: 'Service revenue from consulting project',
+        amount: new Decimal('5000.00'),
+        date: new Date('2024-01-15'),
+        periodId: currentPeriod!.id,
+        reference: 'INV-001',
+        revenueId: revenues[1].id, // Service Revenue
+        journalEntries: {
+          create: [
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '1100')!.id, // Accounts Receivable
+              debit: new Decimal('5000.00')
+            },
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '4100')!.id, // Service Revenue
+              credit: new Decimal('5000.00')
+            }
+          ]
+        },
+        isBalanced: true
+      }
+    }),
+
+    // Payment transaction: Customer pays invoice
+    prisma.transaction.create({
+      data: {
+        type: TransactionType.PAYMENTS,
+        description: 'Customer payment for services',
+        amount: new Decimal('5000.00'),
+        date: new Date('2024-01-20'),
+        periodId: currentPeriod!.id,
+        reference: 'CHK-001',
+        assetId: assets[0].id, // Cash
+        journalEntries: {
+          create: [
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '1000')!.id, // Cash
+              debit: new Decimal('5000.00')
+            },
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '1100')!.id, // Accounts Receivable
+              credit: new Decimal('5000.00')
+            }
+          ]
+        },
+        isBalanced: true
+      }
+    }),
+
+    // Expense transaction: Pay operating expenses
+    prisma.transaction.create({
+      data: {
+        type: TransactionType.PURCHASES,
+        description: 'Monthly operating expenses payment',
+        amount: new Decimal('2500.00'),
+        date: new Date('2024-01-25'),
+        periodId: currentPeriod!.id,
+        reference: 'BILL-001',
+        expenseId: expenses[1].id, // Operating Expenses
+        journalEntries: {
+          create: [
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '5100')!.id, // Operating Expenses
+              debit: new Decimal('2500.00')
+            },
+            {
+              accountId: chartOfAccounts.find(acc => acc.accountNumber === '1000')!.id, // Cash
+              credit: new Decimal('2500.00')
+            }
+          ]
+        },
+        isBalanced: true
+      }
+    })
+  ]);
+
   console.log('✅ Database seeding completed successfully!');
   console.log(`📊 Summary:`);
+  console.log(`   - Created ${periods.length} accounting periods`);
+  console.log(`   - Created ${chartOfAccounts.length} chart of accounts entries`);
   console.log(`   - Created ${assets.length} assets`);
   console.log(`   - Created ${liabilities.length} liabilities`);
   console.log(`   - Created ${equity.length} equity entries`);
   console.log(`   - Created ${revenues.length} revenue entries`);
   console.log(`   - Created ${expenses.length} expense entries`);
+  console.log(`   - Created ${transactions.length} transactions`);
 
   // Calculate and display accounting equation
   const totalAssets = assets.reduce((sum, asset) => sum.add(asset.currentValue), new Decimal(0));

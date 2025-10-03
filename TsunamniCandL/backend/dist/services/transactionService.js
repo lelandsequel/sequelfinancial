@@ -29,6 +29,7 @@ class TransactionService {
                         description: input.description,
                         amount: input.amount,
                         date: input.date,
+                        periodId: input.periodId,
                         reference: input.reference,
                         assetId: input.assetId,
                         liabilityId: input.liabilityId,

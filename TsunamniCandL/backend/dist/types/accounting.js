@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionType = exports.AccountStatus = exports.AccountType = exports.EquityType = exports.LiabilityType = exports.AssetType = void 0;
+exports.PeriodStatus = exports.PeriodType = exports.TransactionType = exports.AccountStatus = exports.AccountType = exports.EquityType = exports.LiabilityType = exports.AssetType = void 0;
 // Enums
 var AssetType;
 (function (AssetType) {
@@ -42,4 +42,16 @@ var TransactionType;
     TransactionType["ADJUSTMENTS"] = "ADJUSTMENTS";
     TransactionType["DEPRECIATION"] = "DEPRECIATION";
 })(TransactionType || (exports.TransactionType = TransactionType = {}));
+var PeriodType;
+(function (PeriodType) {
+    PeriodType["MONTHLY"] = "MONTHLY";
+    PeriodType["QUARTERLY"] = "QUARTERLY";
+    PeriodType["ANNUAL"] = "ANNUAL";
+})(PeriodType || (exports.PeriodType = PeriodType = {}));
+var PeriodStatus;
+(function (PeriodStatus) {
+    PeriodStatus["OPEN"] = "OPEN";
+    PeriodStatus["CLOSED"] = "CLOSED";
+    PeriodStatus["LOCKED"] = "LOCKED";
+})(PeriodStatus || (exports.PeriodStatus = PeriodStatus = {}));
 //# sourceMappingURL=accounting.js.map

@@ -50,6 +50,18 @@ enum TransactionType {
   DEPRECIATION
 }
 
+enum PeriodType {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum PeriodStatus {
+  OPEN
+  CLOSED
+  LOCKED
+}
+
 // ASSETS Table
 model Asset {
   id            String     @id @default(cuid())
@@ -161,6 +173,28 @@ model ChartOfAccounts {
   @@map("chart_of_accounts")
 }
 
+// ACCOUNTING PERIODS Table (for Phase 4)
+model Period {
+  id          String       @id @default(cuid())
+  name        String
+  type        PeriodType
+  status      PeriodStatus @default(OPEN)
+  startDate   DateTime
+  endDate     DateTime
+  isCurrent   Boolean      @default(false)
+  closedBy    String?
+  closedAt    DateTime?
+  notes       String?
+
+  // Relations
+  transactions Transaction[]
+
+  // Constraints
+  @@unique([startDate, endDate])
+
+  @@map("periods")
+}
+
 // TRANSACTIONS Table (for Phase 2)
 model Transaction {
   id            String         @id @default(cuid())
@@ -170,6 +204,7 @@ model Transaction {
   date          DateTime
   isBalanced    Boolean        @default(false)
   reference     String?        // Invoice number, check number, etc.
+  periodId      String         // Accounting period this transaction belongs to
   assetId       String?
   liabilityId   String?
   equityId      String?
@@ -179,6 +214,7 @@ model Transaction {
   updatedAt     DateTime       @updatedAt
 
   // Relations
+  period        Period         @relation(fields: [periodId], references: [id])
   asset         Asset?         @relation(fields: [assetId], references: [id])
   liability     Liability?     @relation(fields: [liabilityId], references: [id])
   equity        Equity?        @relation(fields: [equityId], references: [id])
