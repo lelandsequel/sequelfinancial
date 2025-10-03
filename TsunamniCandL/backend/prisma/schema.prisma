@@ -1,0 +1,210 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AssetType {
+  CURRENT
+  FIXED
+}
+
+enum LiabilityType {
+  CURRENT
+  LONG_TERM
+}
+
+enum EquityType {
+  COMMON_STOCK
+  PREFERRED_STOCK
+  ADDITIONAL_PAID_IN_CAPITAL
+  RETAINED_EARNINGS
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum TransactionType {
+  SALES
+  PURCHASES
+  PAYMENTS
+  RECEIPTS
+  ADJUSTMENTS
+  DEPRECIATION
+}
+
+// ASSETS Table
+model Asset {
+  id            String     @id @default(cuid())
+  name          String
+  type          AssetType
+  currentValue  Decimal    @db.Decimal(15, 2)
+  dateAcquired  DateTime
+  description   String?
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  transactions  Transaction[]
+
+  @@map("assets")
+}
+
+// LIABILITIES Table
+model Liability {
+  id          String        @id @default(cuid())
+  name        String
+  type        LiabilityType
+  amountOwed  Decimal       @db.Decimal(15, 2)
+  dueDate     DateTime?
+  creditor    String
+  description String?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  transactions Transaction[]
+
+  @@map("liabilities")
+}
+
+// EQUITY Table
+model Equity {
+  id               String     @id @default(cuid())
+  type             EquityType
+  sharesOutstanding Int?
+  parValue         Decimal?   @db.Decimal(10, 2)
+  retainedEarnings Decimal    @default(0) @db.Decimal(15, 2)
+  description      String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  // Relations
+  transactions     Transaction[]
+
+  @@map("equity")
+}
+
+// REVENUE Table
+model Revenue {
+  id           String   @id @default(cuid())
+  source       String
+  amount       Decimal  @db.Decimal(15, 2)
+  date         DateTime
+  description  String?
+  customerId   String?
+  isRecurring  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  transactions Transaction[]
+
+  @@map("revenue")
+}
+
+// EXPENSES Table
+model Expense {
+  id            String   @id @default(cuid())
+  category      String
+  amount        Decimal  @db.Decimal(15, 2)
+  date          DateTime
+  description   String?
+  vendorId      String?
+  isRecurring   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  transactions  Transaction[]
+
+  @@map("expenses")
+}
+
+// CHART OF ACCOUNTS Table (for Phase 2)
+model ChartOfAccounts {
+  id             String        @id @default(cuid())
+  accountNumber  String        @unique
+  name           String
+  type           AccountType
+  status         AccountStatus  @default(ACTIVE)
+  parentId       String?
+  description    String?
+  isSystem       Boolean       @default(false) // System accounts cannot be deleted
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  parent         ChartOfAccounts? @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children       ChartOfAccounts[] @relation("AccountHierarchy")
+  journalEntries JournalEntry[]
+
+  @@map("chart_of_accounts")
+}
+
+// TRANSACTIONS Table (for Phase 2)
+model Transaction {
+  id            String         @id @default(cuid())
+  type          TransactionType
+  description   String
+  amount        Decimal        @db.Decimal(15, 2)
+  date          DateTime
+  isBalanced    Boolean        @default(false)
+  reference     String?        // Invoice number, check number, etc.
+  assetId       String?
+  liabilityId   String?
+  equityId      String?
+  revenueId     String?
+  expenseId     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  asset         Asset?         @relation(fields: [assetId], references: [id])
+  liability     Liability?     @relation(fields: [liabilityId], references: [id])
+  equity        Equity?        @relation(fields: [equityId], references: [id])
+  revenue       Revenue?       @relation(fields: [revenueId], references: [id])
+  expense       Expense?       @relation(fields: [expenseId], references: [id])
+  journalEntries JournalEntry[]
+
+  @@map("transactions")
+}
+
+// JOURNAL_ENTRIES Table (for Phase 2)
+model JournalEntry {
+  id            String         @id @default(cuid())
+  transactionId String
+  accountId     String         // Reference to Chart of Accounts
+  debit         Decimal?       @db.Decimal(15, 2)
+  credit        Decimal?       @db.Decimal(15, 2)
+  description   String?
+  createdAt     DateTime       @default(now())
+
+  // Relations
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account       ChartOfAccounts @relation(fields: [accountId], references: [id])
+
+  // Constraints
+  @@unique([transactionId, accountId]) // Prevent duplicate account entries per transaction
+
+  @@map("journal_entries")
+}
